@@ -1,3 +1,5 @@
 #this is a commennt
 #this is a commennt from mohamed
 # Edited Booking.js and Event.js --Youssef
+# Ignore node_modules
+node_modules/
