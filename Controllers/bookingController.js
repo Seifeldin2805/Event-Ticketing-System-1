@@ -4,7 +4,8 @@ const eventModel = require("../models/eventModel");
 const bookingController = {
   bookTickets: async (req, res) => {
     try {
-      const { eventId, tickets } = req.body;
+      const { eventId, quantity } = req.body;
+      const tickets = quantity;
 
       // Find the event
       const event = await eventModel.findById(eventId);
@@ -103,6 +104,12 @@ const bookingController = {
         return res.status(403).json({ message: "You do not have permission to cancel this booking" });
       }
 
+      // Increase the event's remaining tickets
+      await eventModel.findByIdAndUpdate(
+        booking.event,
+        { $inc: { remainingTickets: booking.tickets } }
+      );
+
       // Delete the booking
       await bookingModel.findByIdAndDelete(bookingId);
 
@@ -110,6 +117,21 @@ const bookingController = {
     } catch (error) {
       console.error("Error canceling booking:", error);
       res.status(500).json({ message: "Server error" });
+    }
+  },
+  getOrganizerBookings: async (req, res) => {
+    console.log('getOrganizerBookings called. req.user:', req.user);
+    try {
+      // Find all events created by this organizer
+      const events = await eventModel.find({ organizer: req.user.userId });
+      const eventIds = events.map(event => event._id);
+      // Find all bookings for these events
+      const bookings = await bookingModel.find({ event: { $in: eventIds } })
+        .populate('event', 'title totalTickets date');
+      res.status(200).json(bookings);
+    } catch (error) {
+      console.error('Error fetching organizer bookings:', error);
+      res.status(500).json({ message: 'Server error' });
     }
   },
 };

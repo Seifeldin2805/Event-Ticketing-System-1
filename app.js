@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
@@ -9,6 +10,8 @@ const eventRoutes = require("./routes/event");
 const bookingRoutes = require("./routes/booking");
 
 const app = express();
+
+app.use(cors());
 
 // Middleware
 app.use(express.json());
