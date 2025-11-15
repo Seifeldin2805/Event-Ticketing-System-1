@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  MenuItem,
 } from '@mui/material';
 import { eventApi, bookingApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -88,7 +89,9 @@ const EventDetails = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedEvent({ ...editedEvent, [name]: value });
+    // Normalize category to lowercase if it's the category field
+    const normalizedValue = name === 'category' && value ? value.toLowerCase() : value;
+    setEditedEvent({ ...editedEvent, [name]: normalizedValue });
   };
 
   if (loading) {
@@ -118,17 +121,53 @@ const EventDetails = () => {
       <Grid container spacing={4}>
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ p: 3 }}>
-            <img
-              src={event.image || 'https://via.placeholder.com/800x400'}
-              alt={event.title}
-              style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '4px' }}
-            />
-            <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 2 }}>
-              {event.title}
-            </Typography>
-            <Typography variant="body1" paragraph>
-              {event.description}
-            </Typography>
+            {isEditing ? (
+              <TextField
+                fullWidth
+                label="Image URL"
+                name="image"
+                value={editedEvent.image || ''}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+                helperText="Enter a URL for the event image"
+              />
+            ) : (
+              <img
+                src={event.image || 'https://via.placeholder.com/800x400'}
+                alt={event.title}
+                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '4px' }}
+              />
+            )}
+            {isEditing ? (
+              <TextField
+                fullWidth
+                label="Title"
+                name="title"
+                value={editedEvent.title}
+                onChange={handleInputChange}
+                sx={{ mb: 2, mt: 2 }}
+              />
+            ) : (
+              <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 2 }}>
+                {event.title}
+              </Typography>
+            )}
+            {isEditing ? (
+              <TextField
+                fullWidth
+                label="Description"
+                name="description"
+                value={editedEvent.description}
+                onChange={handleInputChange}
+                multiline
+                rows={4}
+                sx={{ mb: 2 }}
+              />
+            ) : (
+              <Typography variant="body1" paragraph>
+                {event.description}
+              </Typography>
+            )}
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -140,9 +179,10 @@ const EventDetails = () => {
                     fullWidth
                     type="datetime-local"
                     name="date"
-                    value={editedEvent.date}
+                    value={editedEvent.date ? new Date(editedEvent.date).toISOString().slice(0, 16) : ''}
                     onChange={handleInputChange}
                     sx={{ mb: 2 }}
+                    InputLabelProps={{ shrink: true }}
                   />
                 ) : (
                   <Typography variant="body1">
@@ -170,7 +210,24 @@ const EventDetails = () => {
                 <Typography variant="subtitle1" color="text.secondary">
                   Category
                 </Typography>
-                <Typography variant="body1">{event.category}</Typography>
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    select
+                    name="category"
+                    value={editedEvent.category || ''}
+                    onChange={handleInputChange}
+                    sx={{ mb: 2 }}
+                  >
+                    <MenuItem value="music">Music</MenuItem>
+                    <MenuItem value="sports">Sports</MenuItem>
+                    <MenuItem value="arts">Arts</MenuItem>
+                    <MenuItem value="food">Food</MenuItem>
+                    <MenuItem value="business">Business</MenuItem>
+                  </TextField>
+                ) : (
+                  <Typography variant="body1">{event.category ? event.category.charAt(0).toUpperCase() + event.category.slice(1) : 'N/A'}</Typography>
+                )}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle1" color="text.secondary">
@@ -179,19 +236,35 @@ const EventDetails = () => {
                 <Typography variant="body1">{event.organizer?.name || 'Organizer'}</Typography>
               </Grid>
             </Grid>
-            {user && user.id === event.organizer?._id && (
+            {user && (user.id === event.organizer?._id || user.role === 'admin') && (
               <Box sx={{ mt: 2 }}>
                 {isEditing ? (
                   <Box>
-                    <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 1 }}>
-                      Save
+                    <Button 
+                      variant="contained" 
+                      onClick={handleSave} 
+                      sx={{ 
+                        mr: 1,
+                      }}
+                    >
+                      Save Changes
                     </Button>
-                    <Button variant="outlined" onClick={handleCancel}>
+                    <Button 
+                      variant="outlined" 
+                      onClick={handleCancel}
+                    sx={{
+                    }}
+                    >
                       Cancel
                     </Button>
                   </Box>
                 ) : (
-                  <Button variant="contained" color="primary" onClick={handleEdit}>
+                  <Button 
+                    variant="contained" 
+                    onClick={handleEdit}
+                    sx={{
+                    }}
+                  >
                     Edit Event
                   </Button>
                 )}
@@ -241,12 +314,18 @@ const EventDetails = () => {
 
             <Button
               variant="contained"
-              color={eventEnded ? "inherit" : "primary"}
               fullWidth
               size="large"
               onClick={handleBooking}
               disabled={!event.remainingTickets || eventEnded}
-              sx={eventEnded ? { backgroundColor: '#bdbdbd', color: '#fff' } : {}}
+              sx={eventEnded ? { 
+                backgroundColor: '#bdbdbd', 
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#9e9e9e',
+                }
+              } : {
+              }}
             >
               {eventEnded ? 'Event Ended' : (!event.remainingTickets ? 'Sold Out' : 'Book Now')}
             </Button>

@@ -60,9 +60,35 @@ const Register = () => {
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
-            Register
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 5,
+            backgroundColor: '#181818',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2,
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            align="center" 
+            gutterBottom
+            sx={{
+              fontWeight: 700,
+              mb: 3,
+              color: '#ffffff',
+            }}
+          >
+            Create Account
+          </Typography>
+          <Typography 
+            variant="body1" 
+            align="center" 
+            color="text.secondary"
+            sx={{ mb: 4 }}
+          >
+            Join us and start exploring amazing events
           </Typography>
 
           {error && (
@@ -144,20 +170,29 @@ const Register = () => {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
               size="large"
-              sx={{ mt: 3 }}
+              sx={{ 
+                mt: 3,
+                py: 1.5,
+              }}
               disabled={authLoading}
             >
-              {authLoading ? <CircularProgress size={24} /> : 'Register'}
+              {authLoading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
             </Button>
           </form>
 
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Typography variant="body2">
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
               Already have an account?{' '}
-              <RouterLink to="/login" style={{ textDecoration: 'none' }}>
-                Login here
+              <RouterLink 
+                to="/login" 
+                style={{ 
+                  textDecoration: 'none',
+                  color: '#1db954',
+                  fontWeight: 600,
+                }}
+              >
+                Sign in here
               </RouterLink>
             </Typography>
           </Box>

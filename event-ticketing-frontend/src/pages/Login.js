@@ -78,9 +78,35 @@ const Login = () => {
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
-            Login
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 5,
+            backgroundColor: '#181818',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2,
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            align="center" 
+            gutterBottom
+            sx={{
+              fontWeight: 700,
+              mb: 3,
+              color: '#ffffff',
+            }}
+          >
+            Welcome Back
+          </Typography>
+          <Typography 
+            variant="body1" 
+            align="center" 
+            color="text.secondary"
+            sx={{ mb: 4 }}
+          >
+            Sign in to your account to continue
           </Typography>
 
           {error && (
@@ -118,23 +144,43 @@ const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
               size="large"
-              sx={{ mt: 3 }}
+              sx={{ 
+                mt: 3,
+                py: 1.5,
+              }}
               disabled={authLoading}
             >
-              {authLoading ? <CircularProgress size={24} /> : 'Login'}
+              {authLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
             </Button>
           </form>
 
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Typography variant="body2">
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
               Don't have an account?{' '}
-              <RouterLink to="/register" style={{ textDecoration: 'none' }}>
-                Register here
+              <RouterLink 
+                to="/register" 
+                style={{ 
+                  textDecoration: 'none',
+                  color: '#1db954',
+                  fontWeight: 600,
+                }}
+              >
+                Create one here
               </RouterLink>
             </Typography>
-            <Button variant="text" size="small" onClick={handleForgotPassword} sx={{ mt: 1 }}>
+            <Button 
+              variant="text" 
+              size="small" 
+              onClick={handleForgotPassword} 
+                sx={{ 
+                mt: 2,
+                color: 'text.secondary',
+                '&:hover': {
+                  color: '#1db954',
+                }
+              }}
+            >
               Forgot Password?
             </Button>
           </Box>

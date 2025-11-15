@@ -42,6 +42,7 @@ const MyEvents = () => {
     price: '',
     category: '',
     totalTickets: '',
+    image: '',
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editEvent, setEditEvent] = useState(null);
@@ -226,7 +227,10 @@ const MyEvents = () => {
         initialValues={newEvent}
         onSubmit={async (form) => {
           try {
-            await eventApi.createEvent(form);
+            console.log('Creating event with form data:', form);
+            const response = await eventApi.createEvent(form);
+            console.log('Event created:', response.data);
+            toast.success('Event created successfully!');
             setOpenDialog(false);
             fetchEvents();
             setNewEvent({
@@ -237,9 +241,13 @@ const MyEvents = () => {
               price: '',
               category: '',
               totalTickets: '',
+              image: '',
             });
           } catch (err) {
-            setError('Failed to create event');
+            console.error('Error creating event:', err);
+            const errorMsg = err.response?.data?.message || 'Failed to create event';
+            setError(errorMsg);
+            toast.error(errorMsg);
           }
         }}
         onCancel={() => setOpenDialog(false)}

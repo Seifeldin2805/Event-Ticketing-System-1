@@ -28,45 +28,81 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => navigate('/')}>
-          Event Ticketing
+    <AppBar position="static" elevation={0}>
+      <Toolbar sx={{ py: 1 }}>
+        <Typography 
+          variant="h5" 
+          component="div" 
+          sx={{ 
+            flexGrow: 1, 
+            cursor: 'pointer',
+            fontWeight: 700,
+            color: '#1db954',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              color: '#1ed760',
+              transform: 'scale(1.02)',
+            }
+          }} 
+          onClick={() => navigate('/')}
+        >
+          🎫 EventTicketing
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           {!user ? (
             <>
-              <Button color="inherit" onClick={() => navigate('/login')}>
+              <Button 
+                variant="outlined" 
+                onClick={() => navigate('/login')}
+              >
                 Login
               </Button>
-              <Button color="inherit" onClick={() => navigate('/register')}>
+              <Button 
+                variant="contained" 
+                onClick={() => navigate('/register')}
+              >
                 Register
               </Button>
             </>
           ) : (
             <>
               {((user.role === 'user') || (user.role === 'admin')) && (
-                <Button color="inherit" onClick={() => navigate('/')}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/')}
+                >
                   Events
                 </Button>
               )}
               {user.role === 'user' && (
-                <Button color="inherit" onClick={() => navigate('/bookings')}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/bookings')}
+                >
                   My Bookings
                 </Button>
               )}
               {user.role === 'organizer' && (
-                <Button color="inherit" onClick={() => navigate('/my-events')}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/my-events')}
+                >
                   My Events
                 </Button>
               )}
               {user.role === 'admin' && (
                 <>
-                  <Button color="inherit" onClick={() => navigate('/admin/events')}>
+                  <Button 
+                    color="inherit" 
+                    onClick={() => navigate('/admin/events')}
+                  >
                     Manage Events
                   </Button>
-                  <Button color="inherit" onClick={() => navigate('/admin/users')}>
+                  <Button 
+                    color="inherit" 
+                    onClick={() => navigate('/admin/users')}
+                  >
                     Manage Users
                   </Button>
                 </>

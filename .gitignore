@@ -3,3 +3,8 @@
 # Edited Booking.js and Event.js --Youssef
 # Ignore node_modules
 node_modules/
+
+# Environment variables (contains sensitive data)
+.env
+.env.local
+.env.*.local

@@ -2,33 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem, Button } from '@mui/material';
 
 const categories = [
-  { value: 'Music', label: 'Music' },
-  { value: 'Sports', label: 'Sports' },
-  { value: 'Arts', label: 'Arts' },
-  { value: 'Food', label: 'Food' },
-  { value: 'Business', label: 'Business' },
+  { value: 'music', label: 'Music' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'arts', label: 'Arts' },
+  { value: 'food', label: 'Food' },
+  { value: 'business', label: 'Business' },
 ];
 
 const EventForm = ({ open, initialValues = {}, onSubmit, onCancel, submitLabel = 'Create Event' }) => {
+  // Helper function to format date for datetime-local input
+  const formatDateForInput = (dateValue) => {
+    if (!dateValue) return '';
+    // If it's already in the correct format (YYYY-MM-DDTHH:mm), return as is
+    if (typeof dateValue === 'string' && dateValue.includes('T')) {
+      return dateValue.slice(0, 16);
+    }
+    // If it's a Date object or ISO string, convert it
+    try {
+      const date = new Date(dateValue);
+      return date.toISOString().slice(0, 16);
+    } catch {
+      return '';
+    }
+  };
+
   const [form, setForm] = useState({
     title: initialValues.title || '',
     description: initialValues.description || '',
-    date: initialValues.date || '',
+    date: formatDateForInput(initialValues.date),
     location: initialValues.location || '',
     price: initialValues.price || '',
-    category: initialValues.category || '',
+    category: initialValues.category ? initialValues.category.toLowerCase() : '',
     totalTickets: initialValues.totalTickets || '',
+    image: initialValues.image || '',
   });
 
   useEffect(() => {
     setForm({
       title: initialValues.title || '',
       description: initialValues.description || '',
-      date: initialValues.date || '',
+      date: formatDateForInput(initialValues.date),
       location: initialValues.location || '',
       price: initialValues.price || '',
-      category: initialValues.category || '',
+      category: initialValues.category ? initialValues.category.toLowerCase() : '',
       totalTickets: initialValues.totalTickets || '',
+      image: initialValues.image || '',
     });
   }, [initialValues, open]);
 
@@ -38,7 +56,13 @@ const EventForm = ({ open, initialValues = {}, onSubmit, onCancel, submitLabel =
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    console.log('EventForm submitting:', form);
+    // Ensure image is included even if empty
+    const formData = {
+      ...form,
+      image: form.image || '', // Ensure image is always a string
+    };
+    onSubmit(formData);
   };
 
   return (
@@ -68,14 +92,15 @@ const EventForm = ({ open, initialValues = {}, onSubmit, onCancel, submitLabel =
           />
           <TextField
             fullWidth
-            type="date"
-            label="Date"
+            type="datetime-local"
+            label="Date & Time"
             name="date"
             value={form.date}
             onChange={handleChange}
             margin="normal"
             InputLabelProps={{ shrink: true }}
             required
+            helperText="Select both date and time for your event"
           />
           <TextField
             fullWidth
@@ -121,6 +146,16 @@ const EventForm = ({ open, initialValues = {}, onSubmit, onCancel, submitLabel =
             onChange={handleChange}
             margin="normal"
             required
+          />
+          <TextField
+            fullWidth
+            label="Image URL"
+            name="image"
+            value={form.image}
+            onChange={handleChange}
+            margin="normal"
+            helperText="Enter a URL for the event image (e.g., https://example.com/image.jpg)"
+            placeholder="https://example.com/event-image.jpg"
           />
         </DialogContent>
         <DialogActions>

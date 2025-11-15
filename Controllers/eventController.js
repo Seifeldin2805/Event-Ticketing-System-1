@@ -3,7 +3,9 @@ const eventModel = require("../models/eventModel");
 const eventController = {
   createEvent: async (req, res) => {
     try {
-      const { title, description, date, location, price, totalTickets, category } = req.body;
+      const { title, description, date, location, price, totalTickets, category, image } = req.body;
+      
+      console.log("Creating event with data:", { title, description, date, location, price, totalTickets, category, image });
 
       const event = new eventModel({
         title,
@@ -14,15 +16,17 @@ const eventController = {
         totalTickets,
         remainingTickets: totalTickets, // Set remainingTickets equal to totalTickets
         organizer: req.user.userId, // Set the organizer to the logged-in user's ID
-        status: "pending", // Set to pending by default
-        category, // Ensure category is saved
+        status: "approved", // Auto-approve for now (change back to "pending" if you want admin approval)
+        category: category ? category.toLowerCase() : category, // Normalize category to lowercase
+        image: image || '', // Save image URL (ensure it's always a string)
       });
 
       await event.save();
+      console.log("Event created successfully:", event);
       res.status(201).json(event);
     } catch (error) {
       console.error("Error creating event:", error);
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: "Server error", error: error.message });
     }
   },
 
@@ -50,6 +54,10 @@ const eventController = {
 
   updateEvent: async (req, res) => {
     try {
+      // Normalize category to lowercase if provided
+      if (req.body.category) {
+        req.body.category = req.body.category.toLowerCase();
+      }
       const updatedEvent = await eventModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!updatedEvent) return res.status(404).json({ message: "Event not found" });
       res.status(200).json({ message: "Event updated successfully", event: updatedEvent });
@@ -109,7 +117,9 @@ const eventController = {
 
   getApprovedEvents: async (req, res) => {
     try {
-      const approvedEvents = await eventModel.find({ status: "approved" });
+      // Always return all approved events, sorted by date (newest first)
+      const approvedEvents = await eventModel.find({ status: "approved" }).sort({ date: 1 });
+      console.log(`Found ${approvedEvents.length} approved events`);
       res.status(200).json(approvedEvents);
     } catch (error) {
       console.error("Error fetching approved events:", error);
@@ -128,7 +138,7 @@ const eventController = {
 
   updateEventWithStatus: async (req, res) => {
     try {
-      const { title, description, date, location, price, totalTickets, status } = req.body;
+      const { title, description, date, location, price, totalTickets, status, category, image } = req.body;
 
       // Find the event by ID
       const event = await eventModel.findById(req.params.id);
@@ -153,6 +163,8 @@ const eventController = {
         event.remainingTickets += totalTickets - event.totalTickets; // Adjust remaining tickets
         event.totalTickets = totalTickets;
       }
+      if (category !== undefined) event.category = category ? category.toLowerCase() : category;
+      if (image !== undefined) event.image = image;
 
       // Only admins can update the status
       if (status && isAdmin) {
